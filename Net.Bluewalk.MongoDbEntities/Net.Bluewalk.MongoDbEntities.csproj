@@ -1,0 +1,58 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net46;net47</TargetFrameworks>
+
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <LangVersion>latest</LangVersion>
+    <Authors>Bluewalk</Authors>
+    <Company>Bluewalk</Company>
+    <Description>.NET Standard library for MongoDB entities</Description>
+    <Copyright>Copyright © 2020 Bluewalk</Copyright>
+    <PackageProjectUrl>https://github.com/bluewalk/dotnet-mongodb-entities</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/bluewalk/dotnet-mongodb-entities</RepositoryUrl>
+    <PackageTags>dotnet .net core mongodb entities</PackageTags>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <RepositoryType>Git</RepositoryType>
+    <PackageReleaseNotes></PackageReleaseNotes>
+    <Version>2020.8.10.1</Version>
+    <AssemblyVersion>2020.8.10.1</AssemblyVersion>
+    <FileVersion>2020.8.10.2</FileVersion>
+    <AssemblyName>Net.Bluewalk.MongoDbEntities</AssemblyName>
+    <RootNamespace>Net.Bluewalk.MongoDbEntities</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="MongoDB.Driver" Version="2.11.0" />
+  </ItemGroup>
+
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1'">
+    <DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_1</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.0'">
+    <DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_0</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net45'">
+    <DefineConstants>NET45;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net46'">
+    <!--<Reference Include="System.Web" />-->
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net46'">
+    <DefineConstants>NET46;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup Condition=" '$(TargetFramework)' == 'net47'">
+    <!--<Reference Include="System.Web" />-->
+  </ItemGroup>
+
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net47'">
+    <DefineConstants>NET47;NETFULL</DefineConstants>
+  </PropertyGroup>
+
+</Project>
