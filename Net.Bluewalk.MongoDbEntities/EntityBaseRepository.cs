@@ -1,20 +1,26 @@
-using System;
+﻿using System;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection;
 using MongoDB.Driver;
 using Net.Bluewalk.MongoDbEntities.Abstract;
+using Net.Bluewalk.MongoDbEntities.Attributes;
 
 namespace Net.Bluewalk.MongoDbEntities
 {
     public class EntityBaseRepository<T> : IEntityBaseRepository<T>
-        where T : class, IEntityBase, new()
+        where T: class, new()
     {
         /// <summary>
         /// MongoClient
         /// </summary>
         protected readonly MongoClient _client;
-        private readonly IMongoDatabase _database;
 
+        /// <summary>
+        /// Database
+        /// </summary>
+        protected readonly IMongoDatabase _database;
+        
         /// <summary>
         /// MongoCollection
         /// </summary>
@@ -25,11 +31,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// </summary>
         public EventHandler<Exception> OnException;
 
-        /// <summary>
-        /// Entity base repository constructor
-        /// </summary>
-        /// <param name="connectionString">Format: mongodb://username:password@host:27017/database</param>
-        protected EntityBaseRepository(string connectionString)
+        public EntityBaseRepository(string connectionString)
         {
             _client = new MongoClient(connectionString);
             _database = _client.GetDatabase(connectionString.Split('/').Last());
@@ -39,17 +41,30 @@ namespace Net.Bluewalk.MongoDbEntities
         }
 
         /// <summary>
+        /// Determine name for table
+        /// </summary>
+        /// <typeparam name="TT"></typeparam>
+        /// <returns></returns>
+        protected virtual string GetTableName<TT>()
+        {
+            var table = typeof(TT).GetCustomAttribute<TableAttribute>()?.Name;
+
+            if (string.IsNullOrEmpty(table))
+                table = (typeof(TT).Name + "s")
+                    .ReplaceEnd("ys", "ies")
+                    .ReplaceEnd("ss", "ses");
+
+            return table;
+        }
+
+        /// <summary>
         /// Get collection
         /// </summary>
         /// <typeparam name="TT"></typeparam>
         /// <returns></returns>
         protected IMongoCollection<TT> GetCollection<TT>()
         {
-            var table = (typeof(TT).Name + "s")
-                .ReplaceEnd("ys", "ies")
-                .ReplaceEnd("ss", "ses");
-
-            return _database.GetCollection<TT>(table, new MongoCollectionSettings
+            return _database.GetCollection<TT>(GetTableName<TT>(), new MongoCollectionSettings
             {
                 AssignIdOnInsert = true
             });
@@ -58,10 +73,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <summary>
         /// Ensure required indexes are created
         /// </summary>
-        protected virtual void EnsureIndexes()
-        {
-
-        }
+        protected virtual void EnsureIndexes() { }
 
         /// <summary>
         /// Gets all entities in a paged format
@@ -71,7 +83,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         public virtual IQueryable<T> GetAll(int limit = 50, int page = 1)
         {
-            var query = (IQueryable<T>) _collection.AsQueryable();
+            var query = (IQueryable<T>)_collection.AsQueryable();
 
             if (limit > 0)
                 query = query.Skip(limit * (page - 1)).Take(limit);
@@ -88,16 +100,6 @@ namespace Net.Bluewalk.MongoDbEntities
             return _collection.AsQueryable().Count();
         }
 
-        /// <summary>
-        /// Gets a single entity matching the ID
-        /// </summary>
-        /// <param name="id"></param>
-        /// <returns></returns>
-        public virtual T GetSingle(long id)
-        {
-            return _collection.Find(q => q.Id == id)
-                .FirstOrDefault();
-        }
 
         /// <summary>
         /// Gets a single entity matching the predicate
@@ -120,65 +122,6 @@ namespace Net.Bluewalk.MongoDbEntities
         public virtual IQueryable<T> FindBy(Expression<Func<T, bool>> predicate)
         {
             return _collection.AsQueryable().Where(predicate);
-        }
-
-        private long Add(T entity)
-        {
-            entity.Id = _collection.Find(e => true)
-                         .Project(e => new {e.Id})
-                         .SortByDescending(e => e.Id)
-                         .FirstOrDefault()?.Id + 1 ?? 1;
-
-            try
-            {
-                _collection.InsertOne(entity);
-            }
-            catch (MongoWriteException we)
-            {
-                if (we.WriteError.Category == ServerErrorCategory.DuplicateKey)
-                    return Add(entity);
-            }
-            catch (Exception e)
-            {
-                OnException?.Invoke(this, e);
-                return -1;
-            }
-
-            return entity.Id;
-        }
-
-        private long Update(T entity)
-        {
-            try
-            {
-                _collection.ReplaceOne(q => q.Id == entity.Id, entity);
-            }
-            catch (Exception e)
-            {
-                OnException?.Invoke(this, e);
-                return -1;
-            }
-
-            return entity.Id;
-        }
-
-        /// <summary>
-        /// Saves the entity
-        /// </summary>
-        /// <param name="entity"></param>
-        /// <returns>The inserted ID</returns>
-        public virtual long Save(T entity)
-        {
-            return entity.Id > 0 ? Update(entity) : Add(entity);
-        }
-
-        /// <summary>
-        /// Deletes given entity
-        /// </summary>
-        /// <param name="entity"></param>
-        public virtual void Delete(T entity)
-        {
-            _collection.DeleteOne(q => q.Id == entity.Id);
         }
 
         /// <summary>
