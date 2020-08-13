@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Net.Bluewalk.MongoDbEntities.Results;
 
 namespace Net.Bluewalk.MongoDbEntities.Extensions
 {

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace Net.Bluewalk.MongoDbEntities
+namespace Net.Bluewalk.MongoDbEntities.Results
 {
     /// <summary>
     /// Paged Result

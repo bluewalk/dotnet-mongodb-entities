@@ -1,6 +1,7 @@
 using System;
 using System.Threading;
 using MongoDB.Driver;
+using Net.Bluewalk.MongoDbEntities.Results;
 
 namespace Net.Bluewalk.MongoDbEntities.Extensions
 {
