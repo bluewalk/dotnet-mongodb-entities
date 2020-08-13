@@ -1,6 +1,6 @@
 using System;
 
-namespace Net.Bluewalk.MongoDbEntities
+namespace Net.Bluewalk.MongoDbEntities.Results
 {
     /// <summary>
     /// PagedResult Base-class
