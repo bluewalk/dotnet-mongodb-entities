@@ -1,10 +1,6 @@
-﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
-
-namespace Net.Bluewalk.MongoDbEntities.Abstract
+﻿namespace Net.Bluewalk.MongoDbEntities.Abstract
 {
-    public interface IEntityIdBaseRepository<T> where T : class, IEntityIdBase, new()
+    public interface IEntityIdBaseRepository<T> : IEntityBaseRepository<T> where T : class, IEntityIdBase, new()
     {
         /// <summary>
         /// Gets a single entity matching the ID
@@ -12,13 +8,6 @@ namespace Net.Bluewalk.MongoDbEntities.Abstract
         /// <param name="id"></param>
         /// <returns></returns>
         T GetSingle(long id);
-
-        /// <summary>
-        /// Finds entities matching the predicate
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        IQueryable<T> FindBy(Expression<Func<T, bool>> predicate);
 
         /// <summary>
         /// Saves the entity
