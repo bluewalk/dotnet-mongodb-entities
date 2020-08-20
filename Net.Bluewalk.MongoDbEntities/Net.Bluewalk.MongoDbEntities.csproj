@@ -15,9 +15,9 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>Git</RepositoryType>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Version>2020.8.13.1</Version>
-    <AssemblyVersion>2020.8.13.1</AssemblyVersion>
-    <FileVersion>2020.8.13.2</FileVersion>
+    <Version>2020.8.20.1</Version>
+    <AssemblyVersion>2020.8.20.1</AssemblyVersion>
+    <FileVersion>2020.8.20.1</FileVersion>
     <AssemblyName>Net.Bluewalk.MongoDbEntities</AssemblyName>
     <RootNamespace>Net.Bluewalk.MongoDbEntities</RootNamespace>
   </PropertyGroup>
