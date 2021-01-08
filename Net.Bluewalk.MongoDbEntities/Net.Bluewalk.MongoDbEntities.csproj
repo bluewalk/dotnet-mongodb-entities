@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>netstandard2.1;netstandard2.0;net46;net47</TargetFrameworks>
+    <TargetFrameworks>netstandard2.1;netstandard2.0;net46;net47;net48;net5</TargetFrameworks>
 
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
     <LangVersion>latest</LangVersion>
@@ -15,17 +15,16 @@
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
     <RepositoryType>Git</RepositoryType>
     <PackageReleaseNotes></PackageReleaseNotes>
-    <Version>2020.8.13.1</Version>
-    <AssemblyVersion>2020.8.13.1</AssemblyVersion>
-    <FileVersion>2020.8.13.2</FileVersion>
+    <Version>2021.1.8.1</Version>
+    <AssemblyVersion>2021.1.8.1</AssemblyVersion>
+    <FileVersion>2021.1.8.1</FileVersion>
     <AssemblyName>Net.Bluewalk.MongoDbEntities</AssemblyName>
     <RootNamespace>Net.Bluewalk.MongoDbEntities</RootNamespace>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="MongoDB.Driver" Version="2.11.0" />
+    <PackageReference Include="MongoDB.Driver" Version="2.11.5" />
   </ItemGroup>
-
 
   <PropertyGroup Condition=" '$(TargetFramework)' == 'netstandard2.1'">
     <DefineConstants>NETCORE;NETSTANDARD;NETSTANDARD2_1</DefineConstants>
@@ -55,4 +54,11 @@
     <DefineConstants>NET47;NETFULL</DefineConstants>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net48'">
+    <DefineConstants>NET48;NETFULL</DefineConstants>
+  </PropertyGroup>
+  
+  <PropertyGroup Condition=" '$(TargetFramework)' == 'net5'">
+    <DefineConstants>NET50;NETFULL</DefineConstants>
+  </PropertyGroup>
 </Project>
