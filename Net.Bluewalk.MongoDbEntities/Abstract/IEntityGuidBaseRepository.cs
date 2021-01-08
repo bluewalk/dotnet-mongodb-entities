@@ -1,10 +1,8 @@
 ﻿using System;
-using System.Linq;
-using System.Linq.Expressions;
 
 namespace Net.Bluewalk.MongoDbEntities.Abstract
 {
-    public interface IEntityGuidBaseRepository<T> where T : class, IEntityGuidBase, new()
+    public interface IEntityGuidBaseRepository<T> : IEntityBaseRepository<T> where T : class, IEntityGuidBase, new()
     {
         /// <summary>
         /// Gets a single entity matching the ID
