@@ -5,6 +5,7 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Net.Bluewalk.MongoDbEntities.Abstract;
 using Net.Bluewalk.MongoDbEntities.Attributes;
 
@@ -83,12 +84,12 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <param name="limit"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public virtual IQueryable<T> GetAll(int limit = 50, int page = 1)
+        public virtual IFindFluent<T, T> GetAll(int limit = 50, int page = 1)
         {
-            var query = (IQueryable<T>)_collection.AsQueryable();
+            var query = _collection.Find(q => true);
 
             if (limit > 0)
-                query = query.Skip(limit * (page - 1)).Take(limit);
+                query = query.Skip(limit * (page - 1)).Limit(limit);
 
             return query;
         }
@@ -99,12 +100,9 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <param name="limit"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public virtual async Task<IEnumerable<T>> GetAllAsync(int limit = 50, int page = 1)
+        public virtual async Task<List<T>> GetAllAsync(int limit = 50, int page = 1)
         {
-            if (limit > 0)
-                return await _collection.Find(q => true).Skip(limit * (page - 1)).Limit(limit).ToListAsync();
-
-            return await _collection.Find(q => true).ToListAsync();
+            return await GetAll(limit, page).ToListAsync();
         }
 
         /// <summary>
@@ -156,19 +154,14 @@ namespace Net.Bluewalk.MongoDbEntities
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public virtual IQueryable<T> FindBy(Expression<Func<T, bool>> predicate)
+        public virtual IFindFluent<T, T> FindBy(Expression<Func<T, bool>> predicate, int limit = 50, int page = 1)
         {
-            return _collection.AsQueryable().Where(predicate);
-        }
+            var query = _collection.Find(predicate);
 
-        /// <summary>
-        /// Finds entities matching the predicate
-        /// </summary>
-        /// <param name="predicate"></param>
-        /// <returns></returns>
-        public virtual async Task<IEnumerable<T>> FindByAsync(Expression<Func<T, bool>> predicate)
-        {
-            return await _collection.Find(predicate).ToListAsync();
+            if (limit > 0)
+                query = query.Skip(limit * (page - 1)).Limit(limit);
+
+            return query;
         }
 
         /// <summary>
