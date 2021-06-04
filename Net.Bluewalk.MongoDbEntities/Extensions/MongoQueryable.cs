@@ -1,12 +1,13 @@
 using System;
-using System.Threading;
+using System.Linq;
 using System.Threading.Tasks;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Net.Bluewalk.MongoDbEntities.Results;
 
 namespace Net.Bluewalk.MongoDbEntities.Extensions
 {
-    public static class FindFluent
+    public static class MongoQueryable
     {
         /// <summary>
         /// Get paged result
@@ -15,16 +16,15 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
         /// <param name="page"></param>
         /// <param name="pageSize"></param>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TProjection"></typeparam>
         /// <returns></returns>
-        public static PagedResult<TProjection> GetPaged<T, TProjection>(this IFindFluent<T, TProjection> query,
-            int page, int pageSize) where TProjection : class
+        public static PagedResult<T> GetPaged<T>(this IMongoQueryable<T> query,
+            int page, int pageSize) where T : class
         {
-            var result = new PagedResult<TProjection>
+            var result = new PagedResult<T>
             {
                 PageCurrent = page,
                 PageSize = pageSize,
-                RowCount = query.CountDocuments(CancellationToken.None)
+                RowCount = query.Count()
             };
 
             var pageCount = (double) result.RowCount / pageSize;
@@ -33,7 +33,7 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
             var skip = (page - 1) * pageSize;
 
             result.Results = pageSize > 0 
-                ? query.Skip(skip).Limit(pageSize).ToList() 
+                ? query.Skip(skip).Take(pageSize).ToList()
                 : query.ToList();
 
             return result;
@@ -46,16 +46,15 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
         /// <param name="page"></param>
         /// <param name="pageSize"></param>
         /// <typeparam name="T"></typeparam>
-        /// <typeparam name="TProjection"></typeparam>
         /// <returns></returns>
-        public static async Task<PagedResult<TProjection>> GetPagedAsync<T, TProjection>(this IFindFluent<T, TProjection> query,
-            int page, int pageSize) where TProjection : class
+        public static async Task<PagedResult<T>> GetPagedAsync<T>(this IMongoQueryable<T> query,
+            int page, int pageSize) where T : class
         {
-            var result = new PagedResult<TProjection>
+            var result = new PagedResult<T>
             {
                 PageCurrent = page,
                 PageSize = pageSize,
-                RowCount = await query.CountDocumentsAsync()
+                RowCount = query.Count()
             };
 
             var pageCount = (double)result.RowCount / pageSize;
@@ -64,7 +63,7 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
             var skip = (page - 1) * pageSize;
 
             result.Results = pageSize > 0 
-                ? await query.Skip(skip).Limit(pageSize).ToListAsync() 
+                ? await query.Skip(skip).Take(pageSize).ToListAsync() 
                 : await query.ToListAsync();
 
             return result;

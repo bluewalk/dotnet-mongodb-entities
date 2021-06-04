@@ -1,4 +1,5 @@
 using System;
+using System.Threading.Tasks;
 using MongoDB.Driver;
 using Net.Bluewalk.MongoDbEntities.Abstract;
 
@@ -23,7 +24,18 @@ namespace Net.Bluewalk.MongoDbEntities
             return _collection.Find(q => q.Id == id)
                 .FirstOrDefault();
         }
-        
+
+        /// <summary>
+        /// Gets a single entity matching the ID
+        /// </summary>
+        /// <param name="id"></param>
+        /// <returns></returns>
+        public virtual async Task<T> GetSingleAsync(long id)
+        {
+            return await _collection.Find(q => q.Id == id)
+                .FirstOrDefaultAsync();
+        }
+
         private long Add(T entity)
         {
             entity.Id = _collection.Find(e => true)
@@ -39,6 +51,31 @@ namespace Net.Bluewalk.MongoDbEntities
             {
                 if (we.WriteError.Category == ServerErrorCategory.DuplicateKey)
                     return Add(entity);
+            }
+            catch (Exception e)
+            {
+                OnException?.Invoke(this, e);
+                return -1;
+            }
+
+            return entity.Id;
+        }
+        
+        private async Task<long> AddAsync(T entity)
+        {
+            entity.Id = (await _collection.Find(e => true)
+                .Project(e => new { e.Id })
+                .SortByDescending(e => e.Id)
+                .FirstOrDefaultAsync())?.Id + 1 ?? 1;
+
+            try
+            {
+                await _collection.InsertOneAsync(entity);
+            }
+            catch (MongoWriteException we)
+            {
+                if (we.WriteError.Category == ServerErrorCategory.DuplicateKey)
+                    return await AddAsync(entity);
             }
             catch (Exception e)
             {
@@ -64,6 +101,21 @@ namespace Net.Bluewalk.MongoDbEntities
             return entity.Id;
         }
 
+        private async Task<long> UpdateAsync(T entity)
+        {
+            try
+            {
+                await _collection.ReplaceOneAsync(q => q.Id == entity.Id, entity);
+            }
+            catch (Exception e)
+            {
+                OnException?.Invoke(this, e);
+                return -1;
+            }
+
+            return entity.Id;
+        }
+
         /// <summary>
         /// Saves the entity
         /// </summary>
@@ -74,6 +126,17 @@ namespace Net.Bluewalk.MongoDbEntities
             return entity.Id > 0 ? Update(entity) : Add(entity);
         }
 
+
+        /// <summary>
+        /// Saves the entity
+        /// </summary>
+        /// <param name="entity"></param>
+        /// <returns>The inserted ID</returns>
+        public virtual async Task<long> SaveAsync(T entity)
+        {
+            return await (entity.Id > 0 ? UpdateAsync(entity) : AddAsync(entity));
+        }
+
         /// <summary>
         /// Deletes given entity
         /// </summary>
@@ -81,6 +144,15 @@ namespace Net.Bluewalk.MongoDbEntities
         public virtual void Delete(T entity)
         {
             _collection.DeleteOne(q => q.Id == entity.Id);
+        }
+
+        /// <summary>
+        /// Deletes given entity
+        /// </summary>
+        /// <param name="entity"></param>
+        public virtual async Task DeleteAsync(T entity)
+        {
+            await _collection.DeleteOneAsync(q => q.Id == entity.Id);
         }
     }
 }
