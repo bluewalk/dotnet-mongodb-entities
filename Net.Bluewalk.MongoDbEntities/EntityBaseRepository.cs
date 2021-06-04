@@ -5,7 +5,6 @@ using System.Linq.Expressions;
 using System.Reflection;
 using System.Threading.Tasks;
 using MongoDB.Driver;
-using MongoDB.Driver.Linq;
 using Net.Bluewalk.MongoDbEntities.Abstract;
 using Net.Bluewalk.MongoDbEntities.Attributes;
 
@@ -81,10 +80,10 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <summary>
         /// Gets all entities in a paged format
         /// </summary>
-        /// <param name="limit"></param>
+        /// <param name="limit">0 for all records</param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public virtual IFindFluent<T, T> GetAll(int limit = 50, int page = 1)
+        public virtual IFindFluent<T, T> GetAll(int limit = 0, int page = 1)
         {
             var query = _collection.Find(q => true);
 
@@ -97,10 +96,10 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <summary>
         /// Gets all entities in a paged format
         /// </summary>
-        /// <param name="limit"></param>
+        /// <param name="limit">0 for all records</param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public virtual async Task<List<T>> GetAllAsync(int limit = 50, int page = 1)
+        public virtual async Task<List<T>> GetAllAsync(int limit = 0, int page = 1)
         {
             return await GetAll(limit, page).ToListAsync();
         }
@@ -153,8 +152,10 @@ namespace Net.Bluewalk.MongoDbEntities
         /// Finds entities matching the predicate
         /// </summary>
         /// <param name="predicate"></param>
+        /// <param name="limit">0 for all records</param>
+        /// <param name="page"></param>
         /// <returns></returns>
-        public virtual IFindFluent<T, T> FindBy(Expression<Func<T, bool>> predicate, int limit = 50, int page = 1)
+        public virtual IFindFluent<T, T> FindBy(Expression<Func<T, bool>> predicate, int limit = 0, int page = 1)
         {
             var query = _collection.Find(predicate);
 

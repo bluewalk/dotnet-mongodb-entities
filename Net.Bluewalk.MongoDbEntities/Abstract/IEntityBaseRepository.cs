@@ -11,18 +11,18 @@ namespace Net.Bluewalk.MongoDbEntities.Abstract
         /// <summary>
         /// Gets all entities in a paged format
         /// </summary>
-        /// <param name="limit"></param>
+        /// <param name="limit">0 for all records</param>
         /// <param name="page"></param>
         /// <returns></returns>
-        IFindFluent<T, T> GetAll(int limit = 50, int page = 1);
+        IFindFluent<T, T> GetAll(int limit = 0, int page = 1);
 
         /// <summary>
         /// Gets all entities in a paged format
         /// </summary>
-        /// <param name="limit"></param>
+        /// <param name="limit">0 for all records</param>
         /// <param name="page"></param>
         /// <returns></returns>
-        Task<List<T>> GetAllAsync(int limit = 50, int page = 1);
+        Task<List<T>> GetAllAsync(int limit = 0, int page = 1);
 
         /// <summary>
         /// Gets total count of entities
@@ -54,8 +54,10 @@ namespace Net.Bluewalk.MongoDbEntities.Abstract
         /// Finds entities matching the predicate
         /// </summary>
         /// <param name="predicate"></param>
+        /// <param name="limit">0 for all records</param>
+        /// <param name="page"></param>
         /// <returns></returns>
-        IFindFluent<T, T> FindBy(Expression<Func<T, bool>> predicate, int limit = 50, int page = 1);
+        IFindFluent<T, T> FindBy(Expression<Func<T, bool>> predicate, int limit = 0, int page = 1);
 
         /// <summary>
         /// Deletes entities matching the predicate
