@@ -1,8 +1,11 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection;
+using System.Threading.Tasks;
 using MongoDB.Driver;
+using MongoDB.Driver.Linq;
 using Net.Bluewalk.MongoDbEntities.Abstract;
 using Net.Bluewalk.MongoDbEntities.Attributes;
 
@@ -81,14 +84,25 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <param name="limit"></param>
         /// <param name="page"></param>
         /// <returns></returns>
-        public virtual IQueryable<T> GetAll(int limit = 50, int page = 1)
+        public virtual IFindFluent<T, T> GetAll(int limit = 50, int page = 1)
         {
-            var query = (IQueryable<T>)_collection.AsQueryable();
+            var query = _collection.Find(q => true);
 
             if (limit > 0)
-                query = query.Skip(limit * (page - 1)).Take(limit);
+                query = query.Skip(limit * (page - 1)).Limit(limit);
 
             return query;
+        }
+
+        /// <summary>
+        /// Gets all entities in a paged format
+        /// </summary>
+        /// <param name="limit"></param>
+        /// <param name="page"></param>
+        /// <returns></returns>
+        public virtual async Task<List<T>> GetAllAsync(int limit = 50, int page = 1)
+        {
+            return await GetAll(limit, page).ToListAsync();
         }
 
         /// <summary>
@@ -100,7 +114,15 @@ namespace Net.Bluewalk.MongoDbEntities
             return _collection.AsQueryable().Count();
         }
 
-
+        /// <summary>
+        /// Gets total count of entities
+        /// </summary>
+        /// <returns></returns>
+        public virtual async Task<long> CountAsync()
+        {
+            return await _collection.CountDocumentsAsync(q => true);
+        }
+        
         /// <summary>
         /// Gets a single entity matching the predicate
         /// </summary>
@@ -115,13 +137,31 @@ namespace Net.Bluewalk.MongoDbEntities
         }
 
         /// <summary>
+        /// Gets a single entity matching the predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        /// <returns></returns>
+        public virtual async Task<T> GetSingleAsync(Expression<Func<T, bool>> predicate)
+        {
+            var builder = Builders<T>.Filter;
+            var query = builder.Where(predicate);
+
+            return await _collection.Find(query).FirstOrDefaultAsync();
+        }
+
+        /// <summary>
         /// Finds entities matching the predicate
         /// </summary>
         /// <param name="predicate"></param>
         /// <returns></returns>
-        public virtual IQueryable<T> FindBy(Expression<Func<T, bool>> predicate)
+        public virtual IFindFluent<T, T> FindBy(Expression<Func<T, bool>> predicate, int limit = 50, int page = 1)
         {
-            return _collection.AsQueryable().Where(predicate);
+            var query = _collection.Find(predicate);
+
+            if (limit > 0)
+                query = query.Skip(limit * (page - 1)).Limit(limit);
+
+            return query;
         }
 
         /// <summary>
@@ -131,6 +171,15 @@ namespace Net.Bluewalk.MongoDbEntities
         public virtual void DeleteWhere(Expression<Func<T, bool>> predicate)
         {
             _collection.DeleteMany(predicate);
+        }
+
+        /// <summary>
+        /// Deletes entities matching the predicate
+        /// </summary>
+        /// <param name="predicate"></param>
+        public virtual async Task DeleteWhereAsync(Expression<Func<T, bool>> predicate)
+        {
+            await _collection.DeleteManyAsync(predicate);
         }
     }
 }
