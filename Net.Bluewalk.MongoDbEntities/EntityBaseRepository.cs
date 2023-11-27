@@ -22,7 +22,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// Database
         /// </summary>
         protected readonly IMongoDatabase _database;
-        
+
         /// <summary>
         /// MongoCollection
         /// </summary>
@@ -35,8 +35,10 @@ namespace Net.Bluewalk.MongoDbEntities
 
         public EntityBaseRepository(string connectionString)
         {
-            _client = new MongoClient(connectionString);
-            _database = _client.GetDatabase(connectionString.Split('/').Last());
+            var mongoUrl = MongoUrl.Create(connectionString);
+
+            _client = new MongoClient(mongoUrl);
+            _database = _client.GetDatabase(mongoUrl.DatabaseName);
             _collection = GetCollection<T>();
 
             EnsureIndexes();
@@ -121,7 +123,7 @@ namespace Net.Bluewalk.MongoDbEntities
         {
             return await _collection.CountDocumentsAsync(q => true);
         }
-        
+
         /// <summary>
         /// Gets a single entity matching the predicate
         /// </summary>
