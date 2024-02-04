@@ -7,16 +7,16 @@
         <Authors>Bluewalk</Authors>
         <Company>Bluewalk</Company>
         <Description>.NET Standard library for MongoDB entities</Description>
-        <Copyright>Copyright © 2023 Bluewalk</Copyright>
+        <Copyright>Copyright © 2024 Bluewalk</Copyright>
         <PackageProjectUrl>https://github.com/bluewalk/dotnet-mongodb-entities</PackageProjectUrl>
         <RepositoryUrl>https://github.com/bluewalk/dotnet-mongodb-entities</RepositoryUrl>
         <PackageTags>dotnet .net core standard mongodb entities</PackageTags>
         <PackageLicenseExpression></PackageLicenseExpression>
         <RepositoryType>Git</RepositoryType>
         <PackageReleaseNotes></PackageReleaseNotes>
-        <Version>2023.11.27.1</Version>
-        <AssemblyVersion>2023.11.27.1</AssemblyVersion>
-        <FileVersion>2023.11.27.1</FileVersion>
+        <Version>2024.02.04.1</Version>
+        <AssemblyVersion>2024.02.04.1</AssemblyVersion>
+        <FileVersion>2024.02.04.1</FileVersion>
         <AssemblyName>Net.Bluewalk.MongoDbEntities</AssemblyName>
         <RootNamespace>Net.Bluewalk.MongoDbEntities</RootNamespace>
         <PackageLicenseFile>LICENSE.md</PackageLicenseFile>
