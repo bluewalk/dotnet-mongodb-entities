@@ -16,7 +16,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <summary>
         /// MongoClient
         /// </summary>
-        protected readonly MongoClient _client;
+        protected readonly IMongoClient _client;
 
         /// <summary>
         /// Database
@@ -37,7 +37,7 @@ namespace Net.Bluewalk.MongoDbEntities
         {
             var mongoUrl = MongoUrl.Create(connectionString);
 
-            _client = new MongoClient(mongoUrl);
+            _client = MongoClientSingleton.GetClient(mongoUrl);
             _database = _client.GetDatabase(mongoUrl.DatabaseName);
             _collection = GetCollection<T>();
 
