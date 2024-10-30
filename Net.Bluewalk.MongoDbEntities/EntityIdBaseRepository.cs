@@ -21,7 +21,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         public virtual T GetSingle(long id)
         {
-            return _collection.Find(q => q.Id == id)
+            return Collection.Find(q => q.Id == id)
                 .FirstOrDefault();
         }
 
@@ -32,20 +32,20 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         public virtual async Task<T> GetSingleAsync(long id)
         {
-            return await _collection.Find(q => q.Id == id)
+            return await Collection.Find(q => q.Id == id)
                 .FirstOrDefaultAsync();
         }
 
         private long Add(T entity)
         {
-            entity.Id = _collection.Find(e => true)
+            entity.Id = Collection.Find(e => true)
                          .Project(e => new {e.Id})
                          .SortByDescending(e => e.Id)
                          .FirstOrDefault()?.Id + 1 ?? 1;
 
             try
             {
-                _collection.InsertOne(entity);
+                Collection.InsertOne(entity);
             }
             catch (MongoWriteException we)
             {
@@ -63,14 +63,14 @@ namespace Net.Bluewalk.MongoDbEntities
         
         private async Task<long> AddAsync(T entity)
         {
-            entity.Id = (await _collection.Find(e => true)
+            entity.Id = (await Collection.Find(e => true)
                 .Project(e => new { e.Id })
                 .SortByDescending(e => e.Id)
                 .FirstOrDefaultAsync())?.Id + 1 ?? 1;
 
             try
             {
-                await _collection.InsertOneAsync(entity);
+                await Collection.InsertOneAsync(entity);
             }
             catch (MongoWriteException we)
             {
@@ -90,7 +90,7 @@ namespace Net.Bluewalk.MongoDbEntities
         {
             try
             {
-                _collection.ReplaceOne(q => q.Id == entity.Id, entity);
+                Collection.ReplaceOne(q => q.Id == entity.Id, entity);
             }
             catch (Exception e)
             {
@@ -105,7 +105,7 @@ namespace Net.Bluewalk.MongoDbEntities
         {
             try
             {
-                await _collection.ReplaceOneAsync(q => q.Id == entity.Id, entity);
+                await Collection.ReplaceOneAsync(q => q.Id == entity.Id, entity);
             }
             catch (Exception e)
             {
@@ -143,7 +143,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <param name="entity"></param>
         public virtual void Delete(T entity)
         {
-            _collection.DeleteOne(q => q.Id == entity.Id);
+            Collection.DeleteOne(q => q.Id == entity.Id);
         }
 
         /// <summary>
@@ -152,7 +152,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <param name="entity"></param>
         public virtual async Task DeleteAsync(T entity)
         {
-            await _collection.DeleteOneAsync(q => q.Id == entity.Id);
+            await Collection.DeleteOneAsync(q => q.Id == entity.Id);
         }
     }
 }

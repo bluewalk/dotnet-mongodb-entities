@@ -16,17 +16,17 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <summary>
         /// MongoClient
         /// </summary>
-        protected readonly IMongoClient _client;
+        protected readonly IMongoClient Client;
 
         /// <summary>
         /// Database
         /// </summary>
-        protected readonly IMongoDatabase _database;
+        protected readonly IMongoDatabase Database;
 
         /// <summary>
         /// MongoCollection
         /// </summary>
-        protected readonly IMongoCollection<T> _collection;
+        protected readonly IMongoCollection<T> Collection;
 
         /// <summary>
         /// When an exception occurs this event will be fired
@@ -37,9 +37,9 @@ namespace Net.Bluewalk.MongoDbEntities
         {
             var mongoUrl = MongoUrl.Create(connectionString);
 
-            _client = MongoClientSingleton.GetClient(mongoUrl);
-            _database = _client.GetDatabase(mongoUrl.DatabaseName);
-            _collection = GetCollection<T>();
+            Client = MongoClientSingleton.GetClient(mongoUrl);
+            Database = Client.GetDatabase(mongoUrl.DatabaseName);
+            Collection = GetCollection<T>();
 
             EnsureIndexes();
         }
@@ -68,7 +68,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         protected IMongoCollection<TT> GetCollection<TT>()
         {
-            return _database.GetCollection<TT>(GetTableName<TT>(), new MongoCollectionSettings
+            return Database.GetCollection<TT>(GetTableName<TT>(), new MongoCollectionSettings
             {
                 AssignIdOnInsert = true
             });
@@ -87,7 +87,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         public virtual IFindFluent<T, T> GetAll(int limit = 0, int page = 1)
         {
-            var query = _collection.Find(q => true);
+            var query = Collection.Find(q => true);
 
             if (limit > 0)
                 query = query.Skip(limit * (page - 1)).Limit(limit);
@@ -112,7 +112,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         public virtual int Count()
         {
-            return _collection.AsQueryable().Count();
+            return Collection.AsQueryable().Count();
         }
 
         /// <summary>
@@ -121,7 +121,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         public virtual async Task<long> CountAsync()
         {
-            return await _collection.CountDocumentsAsync(q => true);
+            return await Collection.CountDocumentsAsync(q => true);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace Net.Bluewalk.MongoDbEntities
             var builder = Builders<T>.Filter;
             var query = builder.Where(predicate);
 
-            return _collection.Find(query).FirstOrDefault();
+            return Collection.Find(query).FirstOrDefault();
         }
 
         /// <summary>
@@ -147,7 +147,7 @@ namespace Net.Bluewalk.MongoDbEntities
             var builder = Builders<T>.Filter;
             var query = builder.Where(predicate);
 
-            return await _collection.Find(query).FirstOrDefaultAsync();
+            return await Collection.Find(query).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -159,7 +159,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <returns></returns>
         public virtual IFindFluent<T, T> FindBy(Expression<Func<T, bool>> predicate, int limit = 0, int page = 1)
         {
-            var query = _collection.Find(predicate);
+            var query = Collection.Find(predicate);
 
             if (limit > 0)
                 query = query.Skip(limit * (page - 1)).Limit(limit);
@@ -173,7 +173,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <param name="predicate"></param>
         public virtual void DeleteWhere(Expression<Func<T, bool>> predicate)
         {
-            _collection.DeleteMany(predicate);
+            Collection.DeleteMany(predicate);
         }
 
         /// <summary>
@@ -182,7 +182,7 @@ namespace Net.Bluewalk.MongoDbEntities
         /// <param name="predicate"></param>
         public virtual async Task DeleteWhereAsync(Expression<Func<T, bool>> predicate)
         {
-            await _collection.DeleteManyAsync(predicate);
+            await Collection.DeleteManyAsync(predicate);
         }
     }
 }
