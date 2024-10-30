@@ -17,7 +17,7 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
         /// <param name="pageSize"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static PagedResult<T> GetPaged<T>(this IMongoQueryable<T> query,
+        public static PagedResult<T> GetPaged<T>(this IQueryable<T> query,
             int page, int pageSize) where T : class
         {
             var result = new PagedResult<T>
@@ -32,7 +32,7 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
 
             var skip = (page - 1) * pageSize;
 
-            result.Results = pageSize > 0 
+            result.Results = pageSize > 0
                 ? query.Skip(skip).Take(pageSize).ToList()
                 : query.ToList();
 
@@ -47,7 +47,7 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
         /// <param name="pageSize"></param>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static async Task<PagedResult<T>> GetPagedAsync<T>(this IMongoQueryable<T> query,
+        public static async Task<PagedResult<T>> GetPagedAsync<T>(this IQueryable<T> query,
             int page, int pageSize) where T : class
         {
             var result = new PagedResult<T>
@@ -62,8 +62,8 @@ namespace Net.Bluewalk.MongoDbEntities.Extensions
 
             var skip = (page - 1) * pageSize;
 
-            result.Results = pageSize > 0 
-                ? await query.Skip(skip).Take(pageSize).ToListAsync() 
+            result.Results = pageSize > 0
+                ? await query.Skip(skip).Take(pageSize).ToListAsync()
                 : await query.ToListAsync();
 
             return result;
